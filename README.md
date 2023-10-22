@@ -1,66 +1,34 @@
-## Foundry
+## README
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+### 執行說明
 
-Foundry consists of:
+```
+git clone https://github.com/tannerang/ERC721ContractsTest.git
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+cd ERC721ContractsTest
 
-## Documentation
-
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
-
-```shell
-$ forge build
+forge test 
 ```
 
-### Test
+### 測試個案說明
 
-```shell
-$ forge test
 ```
+testReceiveRightNFT
+    說明：
+        測試 ReceiverContract 收到來自 HW_Token 合約的 NFT 可以正常接收
+    流程：
+        user1 mint 一個 HWToken 之後 setApprovalForAll 給另一位 operator
+        operator 在 HWTokenContract 執行 safeTransferFrom 到 ReceiverContract
+        ReceiverContract 確認 msg.sender 地址是 HW_Token 合約後正常接收
 
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+testReceiveWrongNFT
+    說明：
+        測試 ReceiverContract 收到非來自 HW_Token 合約的 NFT 不會接收並退回原持有者，且會在另外 mint 一個 HWToken 給原持有者
+    流程：
+        user1 mint 一個 NoUsefulToken 之後 setApprovalForAll 給另一位 operator
+        operator 在 NoUsefulTokenContract 執行 safeTransferFrom 到 ReceiverContract
+        ReceiverContract 確認 msg.sender 地址並非是 HW_Token 合約故不接收
+        將 NoUsefulToken transer 回原持有者
+        額外 mint 一個 HW_Token 給原持有者
+        原持有者最終持有原先的 NoUsefulToken 和一個新的 HW_Token
 ```
